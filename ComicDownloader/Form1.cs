@@ -1,4 +1,5 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -33,8 +34,12 @@ namespace ComicDownloader
 
         private int _pageMaxNumber = 30;
 
-        public Form1()
+        private ILog _log;
+
+        public Form1(ILog log)
         {
+            this._log = log;
+
             InitializeComponent();
 
             Init();
@@ -61,6 +66,9 @@ namespace ComicDownloader
             folderBrowser.ShowDialog();
 
             lblPath.Text = folderBrowser.SelectedPath;
+
+            numericFrom.Value = 1;
+            numericTo.Value = 1;
         }
 
         private void numericFrom_ValueChanged(object sender, EventArgs e)
@@ -111,21 +119,23 @@ namespace ComicDownloader
                         dlUri = dic.Key;
                         var uri = new Uri(dic.Key);
 
-                        //client.DownloadFile(uri, dic.Value);
-
                         if (CheckFile(dic.Key))
                         {
+                            _log.Info($"DL Uri .. {dlUri} start");
                             client.DownloadFile(uri, dic.Value);
+
+                            _log.Info($"DL Uri .. done");
                         }
                     }
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine("DL Uri .." + dlUri);
-                Console.WriteLine(e);
+                _log.Error($"DL Uri..{dlUri}");
+                _log.Error(e);
             }
 
+            _log.Info("done..");
             MessageBox.Show("done..");
         }
 
@@ -140,11 +150,13 @@ namespace ComicDownloader
             {
                 for (int pageNumber = 1; pageNumber <= _pageMaxNumber; pageNumber++)
                 {
-                    var fixPageNumber = this.FixPageNumber(pageNumber);
+                    var fixPageNumber = this.FixNumber(pageNumber);
 
-                    var dlUri = string.Format(_baseUri, comic.Id, minVol, fixPageNumber);
+                    var fixVolNumber = this.FixNumber(minVol);
 
-                    var fileName = string.Format(_baseFileName, lblPath.Text, comic.Name, minVol, fixPageNumber);
+                    var dlUri = string.Format(_baseUri, comic.Id, fixVolNumber, fixPageNumber);
+
+                    var fileName = string.Format(_baseFileName, lblPath.Text, comic.Name, fixVolNumber, fixPageNumber);
 
                     this.CheckPath(fileName);
 
@@ -165,9 +177,14 @@ namespace ComicDownloader
             }
         }
 
-        private string FixPageNumber(int pageNumber)
+        private string FixNumber(int number)
         {
-            return pageNumber.ToString().PadLeft(3, '0');
+            return number.ToString().Trim().PadLeft(3, '0');
+        }
+
+        private string FixNumber(decimal number)
+        {
+            return number.ToString().Trim().PadLeft(3, '0');
         }
 
         private bool CheckFile(string url)
@@ -185,8 +202,7 @@ namespace ComicDownloader
             catch (Exception ex)
             {
                 isFileExist = false;
-
-                Console.WriteLine(ex);
+                _log.Error($"CheckFile Error Url .. {url}", ex);
             }
             finally
             {
