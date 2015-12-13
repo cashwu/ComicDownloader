@@ -151,6 +151,7 @@
             this.cbComic.Name = "cbComic";
             this.cbComic.Size = new System.Drawing.Size(121, 20);
             this.cbComic.TabIndex = 11;
+            this.cbComic.SelectedIndexChanged += new System.EventHandler(this.cbComic_SelectedIndexChanged);
             // 
             // Form1
             // 

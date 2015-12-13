@@ -14,7 +14,8 @@ namespace ComicDownloader
             { 1698, "食戟之靈" },
             { 1220, "美食的俘虜" },
             { 3945, "火之丸相扑" },
-            { 1152, "海賊王" }
+            { 1152, "海賊王" },
+            { 3583, "一拳超人"}
         };
 
         /// <summary>
@@ -214,6 +215,12 @@ namespace ComicDownloader
             }
 
             return isFileExist;
+        }
+
+        private void cbComic_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            numericFrom.Value = 1;
+            numericTo.Value = 1;
         }
     }
 
