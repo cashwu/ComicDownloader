@@ -1,6 +1,7 @@
 ﻿using log4net;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Net;
 using System.Windows.Forms;
@@ -23,7 +24,7 @@ namespace ComicDownloader
         /// {1} => vol number
         /// {2} => page number
         /// </summary>
-        private string _baseUri = @"http://web4.cartoonmad.com/c86es736r62/{0}/{1}/{2}.jpg";
+        private string BaseUrl => ConfigurationManager.AppSettings["BaseUrl"];
 
         /// <summary>
         /// {0} => base path
@@ -155,7 +156,7 @@ namespace ComicDownloader
 
                     var fixVolNumber = this.FixNumber(minVol);
 
-                    var dlUri = string.Format(_baseUri, comic.Id, fixVolNumber, fixPageNumber);
+                    var dlUri = string.Format(BaseUrl, comic.Id, fixVolNumber, fixPageNumber);
 
                     var fileName = string.Format(_baseFileName, lblPath.Text, comic.Name, fixVolNumber, fixPageNumber);
 
